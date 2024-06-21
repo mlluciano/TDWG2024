@@ -24,7 +24,7 @@ systemPrompt = """
     generate the query.
 """
 
-def generateQuery(question: str) -> LLMQueryOutput:
+def generate_query(question: str) -> LLMQueryOutput:
     """
     Parses a natural language question and returns an llm-generated query.
 
@@ -36,7 +36,7 @@ def generateQuery(question: str) -> LLMQueryOutput:
     """
     return client.chat.completions.create(
         model="gpt-4o",
-        temperature=0,
+        temperature=1,
         response_model=LLMQueryOutput,
         messages=[
         {
@@ -50,5 +50,5 @@ def generateQuery(question: str) -> LLMQueryOutput:
     ],
     )
 
-initial_response = generateQuery("Which state in the US has the most bears?").model_dump(exclude_none=True)
+initial_response = generate_query("Fetch all the galax urceolata collected in the united states.").model_dump(exclude_none=True)
 print(initial_response['rq'])
