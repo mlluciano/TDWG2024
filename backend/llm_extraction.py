@@ -15,18 +15,19 @@ client = instructor.from_openai(OpenAI())
 # List of indexed field names ['associatedsequences', 'barcodevalue', 'basisofrecord', 'catalognumber', ...
 field_names = [field['field_name'] for field in fields]
 
-systemPrompt = f"""
+systemPrompt = """
     You are an LLM that specializes in converting natural language queries to iDigBio queries in iDigBio query format. 
     You should use scientific names whenever possible. If there are multiple relevant scientificnames, search for them all. 
     
-    Example output: rq = {"stateprovince":"Florida","scientificname":"anura"}
+    Example output: rq = {{"stateprovince":"Florida","scientificname":"anura"}}
     You can search for multiple values within a field by separating the values with a comma. Single values should be a text string. 
-    Example with multiple values for a single field: {"stateprovince":"Florida","scientificname":["anura","araneae"]}
+    Example with multiple values for a single field: {{"stateprovince":"Florida","scientificname":["anura","araneae"]}}
     For example, if the user asks a question about Spiders, you should query for scientificname "Araneae".
     
-    You can utilize the following fields in your query: "${field_names}". Consider the user's natural language input, take your time to determine the relevat fields to be used, and when you're ready
+    You can utilize the following fields in your query: {0}. Consider the user's natural language input, take your time to determine the relevat fields to be used, and when you're ready
     generate the query.
-"""
+""".format(field_names)
+
 
 def generate_query(question: str) -> LLMQueryOutput:
     """
@@ -53,6 +54,7 @@ def generate_query(question: str) -> LLMQueryOutput:
         }
     ],
     )
+
 
 initial_response = generate_query("Fetch all the galax urceolata collected in the united states.").model_dump(exclude_none=True)
 print(initial_response['rq'])

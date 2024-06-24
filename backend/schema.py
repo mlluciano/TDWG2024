@@ -8,7 +8,7 @@ from datetime import date
 from fields import fields
 
 field_names = [field['field_name'] for field in fields]
-print(field_names)
+
 
 class GeoPoint(BaseModel):
     """
@@ -16,6 +16,7 @@ class GeoPoint(BaseModel):
     """
     latitude: Optional[float] = Field(None)
     longitude: Optional[float] = Field(None)
+
 
 class IDBQuerySchema(BaseModel):
     """
@@ -74,12 +75,14 @@ class IDBQuerySchema(BaseModel):
     version: Optional[int] = None
     waterbody: Optional[str] = None
 
+
 class LLMQueryOutput(BaseModel):
     """
     This schema represents the output containing the LLM-generated iDigBio query. 
     """
     input: str = Field(..., description="This field should contain the user's original input verbatim.")
     rq: IDBQuerySchema = Field(..., description="This is the iDigBio Query format and should contain the query generated from the user's plain text input.")
+
 
 class LLMFinalOutput(BaseModel):
     """

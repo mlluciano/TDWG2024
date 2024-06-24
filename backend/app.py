@@ -4,12 +4,13 @@ from flask_cors import CORS
 import time, json
 
 app = Flask(__name__)
-
 CORS(app)
+
 
 @app.route('/api', methods=['GET'])
 def home():
     return jsonify({"message": "Hello, World!"})
+
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -18,6 +19,7 @@ def chat():
     generated_query = json.dumps(generate_query(user_text).model_dump(exclude_none=True))
     
     return {"text": f"Here is the query I generated: {generated_query} "}
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
