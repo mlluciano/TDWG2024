@@ -6,12 +6,16 @@ import instructor
 from openai import OpenAI
 from dotenv import load_dotenv
 from schema import LLMQueryOutput, LLMFinalOutput
+from fields import fields
 
 # Load API key and patch the instructor client
-load_dotenv() 
+load_dotenv()
 client = instructor.from_openai(OpenAI())
 
-systemPrompt = """
+# List of indexed field names ['associatedsequences', 'barcodevalue', 'basisofrecord', 'catalognumber', ...
+field_names = [field['field_name'] for field in fields]
+
+systemPrompt = f"""
     You are an LLM that specializes in converting natural language queries to iDigBio queries in iDigBio query format. 
     You should use scientific names whenever possible. If there are multiple relevant scientificnames, search for them all. 
     
@@ -20,7 +24,7 @@ systemPrompt = """
     Example with multiple values for a single field: {"stateprovince":"Florida","scientificname":["anura","araneae"]}
     For example, if the user asks a question about Spiders, you should query for scientificname "Araneae".
     
-    You can utilize the following fields in your query: "${fieldNames}". Consider the user's natural language input, take your time to determine the relevat fields to be used, and when you're ready
+    You can utilize the following fields in your query: "${field_names}". Consider the user's natural language input, take your time to determine the relevat fields to be used, and when you're ready
     generate the query.
 """
 

@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
-# from llm_extraction import generate_query
+from llm_extraction import generate_query
 from flask_cors import CORS
-import time
+import time, json
 
 app = Flask(__name__)
 
@@ -14,9 +14,10 @@ def home():
 @app.route('/chat', methods=['POST'])
 def chat():
     data = request.json
-    print(data)
-    time.sleep(1)
-    return {"text": "This is an automated response. Implement the LLM calling!"}
+    user_text = data['messages'][0]['text']
+    generated_query = json.dumps(generate_query(user_text).model_dump(exclude_none=True))
+    
+    return {"text": f"Here is the query I generated: {generated_query} "}
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)

@@ -5,6 +5,10 @@ This module provides pydantic schema used to craft and validate LLM responses.
 from pydantic import Field, BaseModel, model_validator, ValidationInfo
 from typing import Optional, List, Union
 from datetime import date
+from fields import fields
+
+field_names = [field['field_name'] for field in fields]
+print(field_names)
 
 class GeoPoint(BaseModel):
     """
