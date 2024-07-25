@@ -2,10 +2,12 @@
 This module provides pydantic schema used to craft and validate LLM responses.
 """
 
-from pydantic import Field, BaseModel, model_validator, ValidationInfo
+from pydantic import Field, BaseModel, model_validator, ValidationInfo, AfterValidator
 from typing import Optional, List, Union
 from datetime import date
 from fields import fields
+import requests
+from typing_extensions import Annotated
 
 field_names = [field['field_name'] for field in fields]
 
@@ -17,6 +19,15 @@ class GeoPoint(BaseModel):
     latitude: Optional[float] = Field(None)
     longitude: Optional[float] = Field(None)
 
+def common_name_must_exist(s: str) -> str:
+    url = f"https://api.checklistbank.org/vernacular?q={s}"
+    res = requests.get(url)
+    data = res.json()
+    print(data)
+    if data['empty'] == True:
+        raise ValueError(f"Common name '{s}' does not exist.")
+    
+    return s
 
 class IDBQuerySchema(BaseModel):
     """
@@ -31,7 +42,7 @@ class IDBQuerySchema(BaseModel):
     collectionid: Optional[str] = None
     collectionname: Optional[str] = None
     collector: Optional[str] = None
-    commonname: Optional[str] = None
+    commonname: Annotated[Optional[str], AfterValidator(common_name_must_exist)] = None
     continent: Optional[str] = None
     country: Optional[str] = None
     county: Optional[str] = None
@@ -74,6 +85,10 @@ class IDBQuerySchema(BaseModel):
     verbatimlocality: Optional[str] = None
     version: Optional[int] = None
     waterbody: Optional[str] = None
+
+
+
+
 
 
 class LLMQueryOutput(BaseModel):

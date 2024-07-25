@@ -7,6 +7,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from schema import LLMQueryOutput, LLMFinalOutput
 from fields import fields
+from pydantic import ValidationError
 
 # Load API key and patch the instructor client
 load_dotenv()
@@ -29,6 +30,9 @@ systemPrompt = """
 """.format(field_names)
 
 
+
+    
+
 def generate_query(question: str) -> LLMQueryOutput:
     """
     Parses a natural language question and returns an llm-generated query.
@@ -43,6 +47,7 @@ def generate_query(question: str) -> LLMQueryOutput:
         model="gpt-4o",
         temperature=1,
         response_model=LLMQueryOutput,
+        max_retries=2,
         messages=[
         {
             "role": "system",
@@ -55,6 +60,9 @@ def generate_query(question: str) -> LLMQueryOutput:
     ],
     )
 
+try:
 
-initial_response = generate_query("Fetch all the galax urceolata collected in the united states.").model_dump(exclude_none=True)
-print(initial_response['rq'])
+    initial_response = generate_query("Fetch all the galax urceolata collected in the united states.").model_dump(exclude_none=True)
+    print(initial_response['rq'])
+except ValidationError as e:
+    print(e)
