@@ -29,6 +29,49 @@ def common_name_must_exist(s: str) -> str:
     
     return s
 
+# class QueryStringSchema(BaseModel):
+#     default_field: str = None
+#     query: 
+
+class QueryPart(BaseModel):
+    field: Optional[str] = None  # Optional, can override default field
+    value: str
+
+class LogicalExpression(BaseModel):
+    operator: str  # 'AND' or 'OR'
+    values: list[str]
+    # expressions: List[Union['LogicalExpression', QueryPart]]
+
+    # Pydantic models require this configuration for recursive models
+    class Config:
+        arbitrary_types_allowed = True
+        keep_untouched = (tuple,)
+
+class QueryString(BaseModel):
+    default_field: str
+    query: Union[QueryPart, LogicalExpression]
+
+# class Query(BaseModel):
+#     query_string: QueryString
+
+class FieldValuePair(BaseModel):
+    field: str
+    value: str
+
+class Expression(BaseModel):
+    operator: str # 'AND' or 'OR'
+    pairs: list[FieldValuePair]
+
+class Q(BaseModel):
+    expressions: list[Expression] 
+
+
+
+
+
+
+
+
 class IDBQuerySchema(BaseModel):
     """
     This schema represents the iDigBio Query Format. 
@@ -96,7 +139,7 @@ class LLMQueryOutput(BaseModel):
     This schema represents the output containing the LLM-generated iDigBio query. 
     """
     input: str = Field(..., description="This field should contain the user's original input verbatim.")
-    rq: IDBQuerySchema = Field(..., description="This is the iDigBio Query format and should contain the query generated from the user's plain text input.")
+    rq: Q = Field(..., description="This is the iDigBio Query in ElasticSearch 2.4 query string format and should contain the query generated from the user's plain text input.")
 
 
 class LLMFinalOutput(BaseModel):
